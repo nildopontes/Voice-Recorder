@@ -1,0 +1,67 @@
+html, body{
+   margin:0;
+   padding:0;
+}
+h1{
+   text-align:center;
+}
+.btns{
+   width:90vw;
+   height:30px;
+   font-size:18px;
+   margin-left:5vw;
+   margin-bottom:5vw;
+}
+.btns > div{
+   float:left;
+   width:30px;
+   height:30px;
+   background:#E6E6E6;
+   border-radius:4px;
+   text-align:center;
+   line-height:30px;
+   margin-right:10px;
+   cursor:pointer;
+}
+.btns > div:nth-child(1){
+   color:red;
+}
+.record{
+   width:90vw;
+   height:30px;
+   background:#E6E6E6;
+   border-radius:4px;
+   margin-bottom:10px;
+   margin-left:5vw;
+}
+.record > div{
+   float:left;
+   line-height:30px;
+}
+.record > div:nth-child(1){
+   width:40px;
+   height:30px;
+   text-align:center;
+}
+.record > div:nth-child(2){
+   width:calc(90vw - 130px);
+   height:30px;
+}
+.record > div:nth-child(3){
+   float:right;
+   width:30px;
+   height:30px;
+   cursor:pointer;
+}
+.record > div:nth-child(4){
+   float:right;
+   width:30px;
+   height:30px;
+   cursor:pointer;
+}
+.record > div:nth-child(5){
+   float:right;
+   width:30px;
+   height:30px;
+   cursor:pointer;
+}

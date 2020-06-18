@@ -1,4 +1,4 @@
-<script>
+document.addEventListener("DOMContentLoaded", function(e){
    var startRecordingButton = document.getElementById("startRecordingButton");
    var stopRecordingButton = document.getElementById("stopRecordingButton");
    var playButton = document.getElementById("playButton");
@@ -146,4 +146,4 @@
          view.setUint8(offset + i, string.charCodeAt(i));
       }
    }
-</script>
+});
