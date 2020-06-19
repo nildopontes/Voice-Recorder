@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function(e){
 
    startRecordingButton.addEventListener("click", function(){
       // Initialize recorder
+      startRecordingButton.classList.add('recording');
       navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
       navigator.getUserMedia({audio: true},
       function(e){
@@ -51,7 +52,8 @@ document.addEventListener("DOMContentLoaded", function(e){
    });
 
    stopRecordingButton.addEventListener("click", function(){
-      // stop recording
+	  // stop recording
+	  startRecordingButton.classList.remove('recording');
       recorder.disconnect(context.destination);
       mediaStream.disconnect(recorder);
 

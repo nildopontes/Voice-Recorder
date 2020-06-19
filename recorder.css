@@ -65,3 +65,12 @@ h1{
    height:30px;
    cursor:pointer;
 }
+.recording{
+   animation-name:rec;
+   animation-duration:2s;
+   animation-iteration-count:300;
+}
+@keyframes rec{
+  0%   {color: red;}
+  100% {color: #E6E6E6;}
+}
