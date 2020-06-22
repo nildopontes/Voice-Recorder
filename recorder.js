@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", function(e){
    var downloadButton = document.getElementById("downloadButton");
 
    var leftchannel = [];
-   var rightchannel = [];
    var recorder = null;
    var recordingLength = 0;
    var volume = null;
@@ -17,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function(e){
    startRecordingButton.addEventListener("click", function(){
       // Initialize recorder
       startRecordingButton.classList.add('recording');
-      navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+      navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
       navigator.getUserMedia({audio: true},
       function(e){
          console.log("user consent");
@@ -29,17 +28,15 @@ document.addEventListener("DOMContentLoaded", function(e){
          // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createScriptProcessor
          // bufferSize: the onaudioprocess event is called when the buffer is full
          var bufferSize = 2048;
-         var numberOfInputChannels = 2;
-         var numberOfOutputChannels = 2;
+         var numberOfInputChannels = 1;
+         var numberOfOutputChannels = 1;
          if(context.createScriptProcessor){
             recorder = context.createScriptProcessor(bufferSize, numberOfInputChannels, numberOfOutputChannels);
          }else{
             recorder = context.createJavaScriptNode(bufferSize, numberOfInputChannels, numberOfOutputChannels);
          }
-         
          recorder.onaudioprocess = function(e){
                leftchannel.push(new Float32Array(e.inputBuffer.getChannelData(0)));
-               rightchannel.push(new Float32Array(e.inputBuffer.getChannelData(1)));
                recordingLength += bufferSize;
             }
             // we connect the recorder
@@ -60,10 +57,9 @@ document.addEventListener("DOMContentLoaded", function(e){
       // we flat the left and right channels down
       // Float32Array[] => Float32Array
       var leftBuffer = flattenArray(leftchannel, recordingLength);
-      var rightBuffer = flattenArray(rightchannel, recordingLength);
       // we interleave both channels together
       // [left[0],right[0],left[1],right[1],...]
-      var interleaved = interleave(leftBuffer, rightBuffer);
+      var interleaved = interleave(leftBuffer);
       // we create our wav file
       var buffer = new ArrayBuffer(44 + interleaved.length * 2);
       var view = new DataView(buffer);
@@ -76,10 +72,10 @@ document.addEventListener("DOMContentLoaded", function(e){
       writeUTFBytes(view, 12, 'fmt ');
       view.setUint32(16, 16, true); // chunkSize
       view.setUint16(20, 1, true); // wFormatTag
-      view.setUint16(22, 2, true); // wChannels: stereo (2 channels)
+      view.setUint16(22, 1, true); // wChannels: stereo (2 channels)
       view.setUint32(24, sampleRate, true); // dwSamplesPerSec
-      view.setUint32(28, sampleRate * 4, true); // dwAvgBytesPerSec
-      view.setUint16(32, 4, true); // wBlockAlign
+      view.setUint32(28, sampleRate * 2, true); // dwAvgBytesPerSec
+      view.setUint16(32, 2, true); // wBlockAlign
       view.setUint16(34, 16, true); // wBitsPerSample
       // data sub-chunk
       writeUTFBytes(view, 36, 'data');
@@ -131,13 +127,12 @@ document.addEventListener("DOMContentLoaded", function(e){
       return result;
    }
 
-   function interleave(leftChannel, rightChannel){
-      var length = leftChannel.length + rightChannel.length;
+   function interleave(leftChannel){
+      var length = leftChannel.length;
       var result = new Float32Array(length);
       var inputIndex = 0;
       for(var index = 0; index < length;){
          result[index++] = leftChannel[inputIndex];
-         result[index++] = rightChannel[inputIndex];
          inputIndex++;
       }
       return result;
