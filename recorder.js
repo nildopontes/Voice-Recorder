@@ -4,7 +4,8 @@ document.addEventListener("DOMContentLoaded", function(e){
    var playButton = document.getElementById("playButton");
    var downloadButton = document.getElementById("downloadButton");
 
-   var leftchannel = [];
+   var mainBuffer = [];
+   var tempBuffer;
    var recorder = null;
    var recordingLength = 0;
    var volume = null;
@@ -12,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function(e){
    var sampleRate = 44100;
    var context = null;
    var blob = null;
+   var bufferSize = 2048;
 
    startRecordingButton.addEventListener("click", function(){
       // Initialize recorder
@@ -27,17 +29,13 @@ document.addEventListener("DOMContentLoaded", function(e){
          mediaStream = context.createMediaStreamSource(e);
          // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createScriptProcessor
          // bufferSize: the onaudioprocess event is called when the buffer is full
-         var bufferSize = 2048;
          var numberOfInputChannels = 1;
          var numberOfOutputChannels = 1;
          if(context.createScriptProcessor){
             recorder = context.createScriptProcessor(bufferSize, numberOfInputChannels, numberOfOutputChannels);
-         }else{
-            recorder = context.createJavaScriptNode(bufferSize, numberOfInputChannels, numberOfOutputChannels);
          }
          recorder.onaudioprocess = function(e){
-               leftchannel.push(new Float32Array(e.inputBuffer.getChannelData(0)));
-               recordingLength += bufferSize;
+               mainBuffer.push(new Float32Array(e.inputBuffer.getChannelData(0)));
             }
             // we connect the recorder
             mediaStream.connect(recorder);
@@ -53,20 +51,17 @@ document.addEventListener("DOMContentLoaded", function(e){
 	  startRecordingButton.classList.remove('recording');
       recorder.disconnect(context.destination);
       mediaStream.disconnect(recorder);
-
-      // we flat the left and right channels down
-      // Float32Array[] => Float32Array
-      var leftBuffer = flattenArray(leftchannel, recordingLength);
-      // we interleave both channels together
-      // [left[0],right[0],left[1],right[1],...]
-      var interleaved = interleave(leftBuffer);
+      recordingLength = mainBuffer.length * bufferSize;
+      console.log(recordingLength);
+      tempBuffer = flattenArray();
+      recordingLength = tempBuffer.length;
       // we create our wav file
-      var buffer = new ArrayBuffer(44 + interleaved.length * 2);
+      var buffer = new ArrayBuffer(44 + recordingLength);
       var view = new DataView(buffer);
 
       // RIFF chunk descriptor
       writeUTFBytes(view, 0, 'RIFF');
-      view.setUint32(4, 44 + interleaved.length * 2, true);
+      view.setUint32(4, 44 + recordingLength, true);
       writeUTFBytes(view, 8, 'WAVE');
       // FMT sub-chunk
       writeUTFBytes(view, 12, 'fmt ');
@@ -74,19 +69,17 @@ document.addEventListener("DOMContentLoaded", function(e){
       view.setUint16(20, 1, true); // wFormatTag
       view.setUint16(22, 1, true); // wChannels: stereo (2 channels)
       view.setUint32(24, sampleRate, true); // dwSamplesPerSec
-      view.setUint32(28, sampleRate * 2, true); // dwAvgBytesPerSec
-      view.setUint16(32, 2, true); // wBlockAlign
-      view.setUint16(34, 16, true); // wBitsPerSample
+      view.setUint32(28, sampleRate, true); // dwAvgBytesPerSec
+      view.setUint16(32, 1, true); // wBlockAlign
+      view.setUint16(34, 8, true); // wBitsPerSample
       // data sub-chunk
       writeUTFBytes(view, 36, 'data');
-      view.setUint32(40, interleaved.length * 2, true);
+      view.setUint32(40, recordingLength, true);
 
       // write the PCM samples
-      var index = 44;
-      var volume = 1;
-      for(var i = 0; i < interleaved.length; i++){
-         view.setInt16(index, interleaved[i] * (0x7FFF * volume), true);
-         index += 2;
+      console.log(recordingLength);
+      for(var i = 44; i < recordingLength; i++){
+         view.setUint8(i, ((tempBuffer[i] * 127) + 127), true);
       }
 
       // our final blob
@@ -116,24 +109,13 @@ document.addEventListener("DOMContentLoaded", function(e){
       window.URL.revokeObjectURL(url);
    });
 
-   function flattenArray(channelBuffer, recordingLength){
+   function flattenArray(){
       var result = new Float32Array(recordingLength);
       var offset = 0;
-      for(var i = 0; i < channelBuffer.length; i++){
-         var buffer = channelBuffer[i];
+      for(var i = 0; i < mainBuffer.length; i++){
+         var buffer = mainBuffer[i];
          result.set(buffer, offset);
-         offset += buffer.length;
-      }
-      return result;
-   }
-
-   function interleave(leftChannel){
-      var length = leftChannel.length;
-      var result = new Float32Array(length);
-      var inputIndex = 0;
-      for(var index = 0; index < length;){
-         result[index++] = leftChannel[inputIndex];
-         inputIndex++;
+         offset += bufferSize;
       }
       return result;
    }
