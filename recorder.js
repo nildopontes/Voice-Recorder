@@ -1,19 +1,30 @@
+var mainBuffer = [];
+var recorder = null;
+var recordingLength = 0;
+var volume = null;
+var mediaStream = null;
+var sampleRate = 0;
+var context = null;
+var blob = null;
+var bufferSize = 2048;
+var intervalSampleRate = 6;
+   
 document.addEventListener("DOMContentLoaded", function(e){
    var startRecordingButton = document.getElementById("startRecordingButton");
    var stopRecordingButton = document.getElementById("stopRecordingButton");
    var playButton = document.getElementById("playButton");
    var downloadButton = document.getElementById("downloadButton");
-
-   var mainBuffer = [];
-   var recorder = null;
-   var recordingLength = 0;
-   var volume = null;
-   var mediaStream = null;
-   var sampleRate = 48000;
-   var context = null;
-   var blob = null;
-   var bufferSize = 2048;
-   var intervalSampleRate = 1;
+   var ctx = window.AudioContext || window.webkitAudioContext || false;
+   if(ctx){
+      ctx = new AudioContext();
+      var sampleRate = ctx.sampleRate;
+      for(var i = 3; i <= 6; i++){
+         document.getElementById('sampleRate').innerHTML += '<option value="' + i + '"  selected>' + (sampleRate / i) + ' Hz</option>\n';
+      }
+      sampleRate /= 6;
+   }else{
+      alert('Seu navegador não é compatível com este sistema. Atualize-o ou experimente outro.');
+   }
 
    startRecordingButton.addEventListener("click", function(){
       // Initialize recorder
@@ -75,7 +86,6 @@ document.addEventListener("DOMContentLoaded", function(e){
       view.setUint32(40, recordingLength, true);
 
       // write the PCM samples
-      console.log(recordingLength);
       for(var i = 44; i < recordingLength; i++){
          view.setUint8(i, mainBuffer[i]);
       }
@@ -106,10 +116,14 @@ document.addEventListener("DOMContentLoaded", function(e){
       a.click();
       window.URL.revokeObjectURL(url);
    });
-
+   
+   document.getElementById('sampleRate').addEventListener("change", function(){
+      intervalSampleRate = this.value;
+   });
+});
    function writeUTFBytes(view, offset, string){
       for(var i = 0; i < string.length; i++){
          view.setUint8(offset + i, string.charCodeAt(i));
       }
    }
-});
+
