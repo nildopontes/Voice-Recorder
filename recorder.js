@@ -5,15 +5,15 @@ document.addEventListener("DOMContentLoaded", function(e){
    var downloadButton = document.getElementById("downloadButton");
 
    var mainBuffer = [];
-   var tempBuffer;
    var recorder = null;
    var recordingLength = 0;
    var volume = null;
    var mediaStream = null;
-   var sampleRate = 44100;
+   var sampleRate = 48000;
    var context = null;
    var blob = null;
    var bufferSize = 2048;
+   var intervalSampleRate = 1;
 
    startRecordingButton.addEventListener("click", function(){
       // Initialize recorder
@@ -28,18 +28,19 @@ document.addEventListener("DOMContentLoaded", function(e){
          // creates an audio node from the microphone incoming stream
          mediaStream = context.createMediaStreamSource(e);
          // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createScriptProcessor
-         // bufferSize: the onaudioprocess event is called when the buffer is full
          var numberOfInputChannels = 1;
          var numberOfOutputChannels = 1;
          if(context.createScriptProcessor){
             recorder = context.createScriptProcessor(bufferSize, numberOfInputChannels, numberOfOutputChannels);
          }
          recorder.onaudioprocess = function(e){
-               mainBuffer.push(new Float32Array(e.inputBuffer.getChannelData(0)));
-            }
-            // we connect the recorder
-            mediaStream.connect(recorder);
-            recorder.connect(context.destination);
+		    for(var i = 0; i < bufferSize; i += intervalSampleRate){
+			   mainBuffer.push(e.inputBuffer.getChannelData(0)[i] * 127 + 127);
+			}
+         }
+         // we connect the recorder
+         mediaStream.connect(recorder);
+         recorder.connect(context.destination);
       },
       function(e){
          console.error(e);
@@ -47,14 +48,11 @@ document.addEventListener("DOMContentLoaded", function(e){
    });
 
    stopRecordingButton.addEventListener("click", function(){
-	  // stop recording
-	  startRecordingButton.classList.remove('recording');
+      // stop recording
+      startRecordingButton.classList.remove('recording');
       recorder.disconnect(context.destination);
       mediaStream.disconnect(recorder);
-      recordingLength = mainBuffer.length * bufferSize;
-      console.log(recordingLength);
-      tempBuffer = flattenArray();
-      recordingLength = tempBuffer.length;
+      recordingLength = mainBuffer.length;
       // we create our wav file
       var buffer = new ArrayBuffer(44 + recordingLength);
       var view = new DataView(buffer);
@@ -79,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function(e){
       // write the PCM samples
       console.log(recordingLength);
       for(var i = 44; i < recordingLength; i++){
-         view.setUint8(i, ((tempBuffer[i] * 127) + 127), true);
+         view.setUint8(i, mainBuffer[i]);
       }
 
       // our final blob
@@ -108,17 +106,6 @@ document.addEventListener("DOMContentLoaded", function(e){
       a.click();
       window.URL.revokeObjectURL(url);
    });
-
-   function flattenArray(){
-      var result = new Float32Array(recordingLength);
-      var offset = 0;
-      for(var i = 0; i < mainBuffer.length; i++){
-         var buffer = mainBuffer[i];
-         result.set(buffer, offset);
-         offset += bufferSize;
-      }
-      return result;
-   }
 
    function writeUTFBytes(view, offset, string){
       for(var i = 0; i < string.length; i++){
