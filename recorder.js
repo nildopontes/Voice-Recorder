@@ -34,4 +34,10 @@ function stopRecording(){
 function onRecordingReady(e){
    var audio = document.getElementById('audio');
    audio.src = URL.createObjectURL(e.data);
+   sendRecord(e.data);
+}
+function sendRecord(blob){
+   var xhr = new XMLHttpRequest();
+   xhr.open("POST","server/server.php", true);
+   xhr.send(blob);
 }
