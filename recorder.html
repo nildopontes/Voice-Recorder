@@ -2,25 +2,18 @@
 <html>
    <head>
       <meta charset="utf-8"/>
-      <title>Gravando áudio com JS</title>
+      <title>Audio Recorder</title>
       <link type="text/css" rel="stylesheet" href="recorder.css">
       <script src="recorder.js"></script> 
    </head>
    <body>
       <h1>Audio Recorder</h1>
       <div class="btns">
-		 <div id="startRecordingButton">&#9673;</div>
-         <div id="stopRecordingButton">&#9724;</div>
-         <select id="sampleRate"></select>
+         <button id="start">&#9673;</button>
+         <button id="stop">&#9724;</button>
       </div>
-      <button id="playButton">Play</button>
-      <button id="downloadButton">Download</button>
-      <div class="record">
-         <div>&#9836;</div>
-         <div>Nome do registro de teste</div>
-         <div>&#11123;</div>
-         <div>&#9654;</div>
-         <div>&#10060;</div>
+      <div class="records">
+         <audio id="audio" controls></audio>
       </div>
 </body>
 </html>

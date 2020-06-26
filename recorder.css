@@ -12,7 +12,7 @@ h1{
    margin-left:5vw;
    margin-bottom:5vw;
 }
-.btns > div{
+.btns > *{
    float:left;
    width:30px;
    height:30px;
@@ -22,48 +22,15 @@ h1{
    line-height:30px;
    margin-right:10px;
    cursor:pointer;
+   border:1px solid gray;
 }
-.btns > div:nth-child(1){
-   color:red;
-}
-.record{
+.records{
    width:90vw;
    height:30px;
    background:#E6E6E6;
    border-radius:4px;
    margin-bottom:10px;
    margin-left:5vw;
-}
-.record > div{
-   float:left;
-   line-height:30px;
-}
-.record > div:nth-child(1){
-   width:40px;
-   height:30px;
-   text-align:center;
-}
-.record > div:nth-child(2){
-   width:calc(90vw - 130px);
-   height:30px;
-}
-.record > div:nth-child(3){
-   float:right;
-   width:30px;
-   height:30px;
-   cursor:pointer;
-}
-.record > div:nth-child(4){
-   float:right;
-   width:30px;
-   height:30px;
-   cursor:pointer;
-}
-.record > div:nth-child(5){
-   float:right;
-   width:30px;
-   height:30px;
-   cursor:pointer;
 }
 .recording{
    animation-name:rec;
