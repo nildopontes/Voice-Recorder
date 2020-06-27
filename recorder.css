@@ -24,7 +24,7 @@ h1{
    cursor:pointer;
    border:1px solid gray;
 }
-.records{
+#records{
    width:90vw;
    height:30px;
    background:#E6E6E6;
@@ -36,6 +36,9 @@ h1{
    animation-name:rec;
    animation-duration:2s;
    animation-iteration-count:300;
+}
+audio{
+   display:block;
 }
 @keyframes rec{
   0%   {color: red;}
