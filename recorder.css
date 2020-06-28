@@ -39,6 +39,7 @@ h1{
 }
 audio{
    display:block;
+   width:100%;
 }
 @keyframes rec{
   0%   {color: red;}

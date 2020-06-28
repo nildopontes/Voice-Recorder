@@ -5,12 +5,20 @@
    }
    if(isset($_GET['cmd'])){
       $command = $_GET['cmd'];
+      $id = intval($_GET['id']);
       switch($command){
          case 'delete':
-            echo "Command is delete";
+            $temp = str_split(file_get_contents($data, FILE_TEXT), 1);
+            $temp[$id] = '0';
+            file_put_contents($data, implode('', $temp), FILE_TEXT);
+            if(unlink('records/rec-' + $id + '.oga')){
+               echo '0';
+            }else{
+               echo '1';
+            }
             break;
          case 'update':
-            echo "Command is update";
+            echo file_get_contents($data, FILE_TEXT);
             break;
       }
    }else{
