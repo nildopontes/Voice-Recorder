@@ -1,4 +1,4 @@
-var startButton, recorder, records, xTouchStart, xTouchEnd, touchedId;
+var startButton, recorder, records, xTouchStart, xTouchEnd, touchedId = null;
    
 document.addEventListener('DOMContentLoaded', function(e){
    startButton = document.getElementById('start');
@@ -61,6 +61,9 @@ function showRecord(id){
    wrap.addEventListener('touchstart', touchStartRec);
    wrap.addEventListener('touchmove', touchMoveRec);
    wrap.addEventListener('touchend', touchEndRec);
+   wrap.addEventListener('mousedown', touchStartRec);
+   wrap.addEventListener('mousemove', touchMoveRec);
+   wrap.addEventListener('mouseup', touchEndRec);
    var rec = document.createElement('audio');
    var timestamp = new Date().getTime();
    rec.setAttribute('src', 'server/records/rec-' + id + '.oga?t=' + timestamp);
@@ -82,12 +85,25 @@ function getAllRecords(allData){
 }
 function touchStartRec(){
    touchedId = this.id;
-   xTouchStart = event.touches[0].clientX;
+   if(typeof event.touches === "undefined"){
+      xTouchStart = event.clientX;
+   }else{
+      xTouchStart = event.touches[0].clientX;
+   }
 }
 function touchMoveRec(){
-   xTouchEnd = event.touches[0].clientX;
-   document.getElementById(touchedId).style.marginLeft = xTouchEnd - xTouchStart + 'px';
-   document.getElementById(touchedId).style.opacity = 1 - ((xTouchEnd - xTouchStart) / window.innerWidth);
+   if(typeof event.touches === "undefined"){
+      xTouchEnd = event.clientX;
+   }else{
+      xTouchEnd = event.touches[0].clientX;
+   }
+   if(touchedId != null){
+      document.getElementById(touchedId).style.marginLeft = xTouchEnd - xTouchStart + 'px';
+      document.getElementById(touchedId).style.opacity = 1 - ((xTouchEnd - xTouchStart) / window.innerWidth);
+      if(xTouchEnd - xTouchStart > 100){
+         touchEndRec();
+      }
+   }
 }
 function touchEndRec(){
    if(xTouchEnd - xTouchStart > 100){
