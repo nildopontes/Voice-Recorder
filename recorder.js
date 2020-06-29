@@ -58,9 +58,9 @@ function showRecord(id){
    var wrap = document.createElement('div');
    wrap.setAttribute('id', 'id' + id);
    wrap.setAttribute('class', 'wrapRec');
-   wrap.setAttribute('ontouchstart', 'touchStartRec(' + id + ')');
-   wrap.setAttribute('ontouchmove', 'touchMoveRec()');
-   wrap.setAttribute('ontouchend', 'touchEndRec()');
+   wrap.addEventListener('touchstart', touchStartRec);
+   wrap.addEventListener('touchmove', touchMoveRec);
+   wrap.addEventListener('touchend', touchEndRec);
    var rec = document.createElement('audio');
    var timestamp = new Date().getTime();
    rec.setAttribute('src', 'server/records/rec-' + id + '.oga?t=' + timestamp);
@@ -69,8 +69,8 @@ function showRecord(id){
    records.appendChild(wrap);
 }
 function removeRecord(id){
-   document.getElementById('id' + id).remove();
-   sendCommand('delete', id);
+   document.getElementById(id).remove();
+   sendCommand('delete', parseInt(id.substr(2), 10));
 }
 function getAllRecords(allData){
    var count = allData.length;
@@ -80,14 +80,14 @@ function getAllRecords(allData){
       }
    }
 }
-function touchStartRec(id){
-   touchedId = id;
+function touchStartRec(){
+   touchedId = this.id;
    xTouchStart = event.touches[0].clientX;
 }
 function touchMoveRec(){
    xTouchEnd = event.touches[0].clientX;
-   document.getElementById('id' + touchedId).style.marginLeft = xTouchEnd - xTouchStart + 'px';
-   document.getElementById('id' + touchedId).style.opacity = 1 - ((xTouchEnd - xTouchStart) / window.innerWidth);
+   document.getElementById(touchedId).style.marginLeft = xTouchEnd - xTouchStart + 'px';
+   document.getElementById(touchedId).style.opacity = 1 - ((xTouchEnd - xTouchStart) / window.innerWidth);
 }
 function touchEndRec(){
    if(xTouchEnd - xTouchStart > 100){
@@ -104,6 +104,6 @@ function touchEndRec(){
    xTouchEnd = 0;
 }
 function resetStyleRec(id){
-   document.getElementById('id' + id).style.marginLeft = '0px';
-   document.getElementById('id' + id).style.opacity = 1;
+   document.getElementById(id).style.marginLeft = '0px';
+   document.getElementById(id).style.opacity = 1;
 }
