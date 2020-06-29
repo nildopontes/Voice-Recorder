@@ -2,46 +2,54 @@ html, body{
    margin:0;
    padding:0;
 }
-h1{
-   text-align:center;
+.header{
+   width:100vw;
+   height:30px;
+   background:#58ACFA;
+   color:white;
+   font:15px/30px Helvetica;
+   padding-left:20px;
+   box-sizing:border-box;
 }
 .btns{
-   width:90vw;
-   height:30px;
-   font-size:18px;
-   margin-left:5vw;
-   margin-bottom:5vw;
+   width:100vw;
+   height:50px;
+   background:gray;
+   position:fixed;
+   bottom:0;
 }
-.btns > *{
-   float:left;
-   width:30px;
-   height:30px;
-   background:#E6E6E6;
-   border-radius:4px;
-   text-align:center;
-   line-height:30px;
-   margin-right:10px;
+button{
+   width:50px;
+   height:50px;
+   background:red;
+   border-radius:50%;
+   margin-left:calc(50vw - 25px);
    cursor:pointer;
-   border:1px solid gray;
+   outline:none;
 }
+:focus{
+   outline:none;
+}
+::-moz-focus-inner{
+   border:0;
+}
+
+button:focus { 
+    outline: none; 
+}
+
 #records{
-   width:90vw;
-   height:30px;
-   background:#E6E6E6;
-   border-radius:4px;
-   margin-bottom:10px;
-   margin-left:5vw;
-}
-.recording{
-   animation-name:rec;
-   animation-duration:2s;
-   animation-iteration-count:300;
+   width:100vw;
+   height:calc(100vh - 80px);
+   overflow-y:scroll;
+   padding-top:15px;
+   padding-left:15px;
+   padding-right:15px;
+   box-sizing:border-box;
 }
 audio{
    display:block;
    width:100%;
-}
-@keyframes rec{
-  0%   {color: red;}
-  100% {color: #E6E6E6;}
+   border-radius:15px;
+   margin-bottom:5px;
 }

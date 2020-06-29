@@ -1,34 +1,30 @@
-var startButton, stopButton, recorder, records;
+var startButton, recorder, records;
    
 document.addEventListener("DOMContentLoaded", function(e){
    startButton = document.getElementById("start");
-   stopButton = document.getElementById("stop");
    records = document.getElementById("records");
    navigator.mediaDevices.getUserMedia({
       audio: true
    }).then(function(stream){
       startButton.disabled = false;
-      startButton.addEventListener('click', startRecording);
-      stopButton.addEventListener('click', stopRecording);
+      startButton.addEventListener('mousedown', startRecording);
+      startButton.addEventListener('mouseup', stopRecording);
+      startButton.addEventListener('touchstart', startRecording);
+      startButton.addEventListener('touchend', stopRecording);
       var options = {
          audioBitsPerSecond : 16000,
          mimeType : 'audio/webm;codecs=opus'
       }
       recorder = new MediaRecorder(stream, options);
       recorder.addEventListener('dataavailable', onRecordingReady);
-      sendCommand('update', 0);
    });
+   sendCommand('update', 0);
 });
 function startRecording(){
-   startButton.classList.add('recording');
-   startButton.disabled = true;
-   stopButton.disabled = false;
    recorder.start();
+   console.log('Teste');
 }
 function stopRecording(){
-   startButton.classList.remove('recording');
-   startButton.disabled = false;
-   stopButton.disabled = true;
    recorder.stop();
 }
 function onRecordingReady(e){
