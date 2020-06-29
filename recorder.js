@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", function(e){
 });
 function startRecording(){
    recorder.start();
-   console.log('Teste');
 }
 function stopRecording(){
    recorder.stop();
