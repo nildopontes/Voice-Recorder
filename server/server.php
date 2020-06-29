@@ -11,7 +11,7 @@
             $temp = str_split(file_get_contents($data, FILE_TEXT), 1);
             $temp[$id] = '0';
             file_put_contents($data, implode('', $temp), FILE_TEXT);
-            if(unlink('records/rec-' + $id + '.oga')){
+            if(unlink('records/rec-'.$id.'.oga')){
                echo '0';
             }else{
                echo '1';
