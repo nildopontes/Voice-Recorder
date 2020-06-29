@@ -1,8 +1,8 @@
-var startButton, recorder, records;
+var startButton, recorder, records, xTouchStart, xTouchEnd, touchedId;
    
-document.addEventListener("DOMContentLoaded", function(e){
-   startButton = document.getElementById("start");
-   records = document.getElementById("records");
+document.addEventListener('DOMContentLoaded', function(e){
+   startButton = document.getElementById('start');
+   records = document.getElementById('records');
    navigator.mediaDevices.getUserMedia({
       audio: true
    }).then(function(stream){
@@ -36,7 +36,7 @@ function sendRecord(blob){
          showRecord(this.responseText);
       }
    };
-   xhr.open("POST","server/server.php", true);
+   xhr.open('POST','server/server.php', true);
    xhr.send(blob);
 }
 function sendCommand(command, value){
@@ -55,12 +55,22 @@ function sendCommand(command, value){
    xhr.send();
 }
 function showRecord(id){
-   var rec = document.createElement("audio");
+   var wrap = document.createElement('div');
+   wrap.setAttribute('id', 'id' + id);
+   wrap.setAttribute('class', 'wrapRec');
+   wrap.setAttribute('ontouchstart', 'touchStartRec(' + id + ')');
+   wrap.setAttribute('ontouchmove', 'touchMoveRec()');
+   wrap.setAttribute('ontouchend', 'touchEndRec()');
+   var rec = document.createElement('audio');
    var timestamp = new Date().getTime();
    rec.setAttribute('src', 'server/records/rec-' + id + '.oga?t=' + timestamp);
-   rec.setAttribute('id', 'id' + id);
    rec.setAttribute('controls', '');
-   records.appendChild(rec);
+   wrap.appendChild(rec);
+   records.appendChild(wrap);
+}
+function removeRecord(id){
+   document.getElementById('id' + id).remove();
+   sendCommand('delete', id);
 }
 function getAllRecords(allData){
    var count = allData.length;
@@ -69,4 +79,31 @@ function getAllRecords(allData){
          showRecord(i);
       }
    }
+}
+function touchStartRec(id){
+   touchedId = id;
+   xTouchStart = event.touches[0].clientX;
+}
+function touchMoveRec(){
+   xTouchEnd = event.touches[0].clientX;
+   document.getElementById('id' + touchedId).style.marginLeft = xTouchEnd - xTouchStart + 'px';
+   document.getElementById('id' + touchedId).style.opacity = 1 - ((xTouchEnd - xTouchStart) / window.innerWidth);
+}
+function touchEndRec(){
+   if(xTouchEnd - xTouchStart > 100){
+      if(confirm('Tem certeza que deseja excluir?')){
+         removeRecord(touchedId);
+      }else{
+         resetStyleRec(touchedId);
+      }
+   }else{
+      resetStyleRec(touchedId);
+   }
+   touchedId = null;
+   xTouchStart = 0;
+   xTouchEnd = 0;
+}
+function resetStyleRec(id){
+   document.getElementById('id' + id).style.marginLeft = '0px';
+   document.getElementById('id' + id).style.opacity = 1;
 }
