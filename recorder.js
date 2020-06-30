@@ -1,4 +1,6 @@
-var startButton, recorder, records, xTouchStart, xTouchEnd, touchedId = null;
+var startButton, recorder, records;
+var xTouchStart, xTouchEnd, touchedId = null;
+var recTimeStart, recTimeEnd;
    
 document.addEventListener('DOMContentLoaded', function(e){
    startButton = document.getElementById('start');
@@ -21,14 +23,20 @@ document.addEventListener('DOMContentLoaded', function(e){
    sendCommand('update', 0);
 });
 function startRecording(){
+   recTimeStart = new Date().getTime();
    navigator.vibrate(200);
    recorder.start();
 }
 function stopRecording(){
+   recTimeEnd = new Date().getTime();
    recorder.stop();
 }
 function onRecordingReady(e){
-   sendRecord(e.data);
+   if(recTimeEnd - recTimeStart >= 1000){
+      sendRecord(e.data);
+   }
+   recTimeStart = 0;
+   recTimeEnd = 0;
 }
 function sendRecord(blob){
    var xhr = new XMLHttpRequest();
