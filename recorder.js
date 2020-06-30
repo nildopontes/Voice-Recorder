@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function(e){
    sendCommand('update', 0);
 });
 function startRecording(){
+   navigator.vibrate(200);
    recorder.start();
 }
 function stopRecording(){
